@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% block title %} Blogpost{% endblock title %}
+{% load humanize %}
+
+{% block body %}
+<div class="container my-3">
+
+  <h2 class="blog-post-title">{{post.title}}</h2>
+  <p class="blog-post-meta">{{post.timeStamp}} by <a href="/about">{{post.author}}</a></p>
+
+  <p>{{post.content}}</p>
+  <hr>
+</div>
+<div class="container">
+
+  <h2 class="text-danger">
+    Comments
+    <span class="badge bg-secondary ">{{comments.count}}</span>
+  </h2>
+
+  {% if user.is_authenticated %}
+
+
+
+
+
+  <form action="/blog/postComment" method="post">
+    {% csrf_token %}
+
+    <div class="form-group">
+      <label for="exampleInputEmail1">Post Comments</label><br><br>
+      <input type="comment" name="comment" class="form-control" placeholder="Enter your Comment Here !">
+    </div>
+
+    <input type="hidden" name="postSno" value="{{post.sno}}">
+    <input type="hidden" name="parentSno" value="">
+    <br>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+
+  {% else %}
+
+  <b class="text-warning">** Join us, Login to post a comment !  **</b>
+
+
+
+
+  {% endif %}
+
+  {% for comment in comments %}
+
+  <div class="row my-3 ">
+    <div class="col-md-1">
+      <img src="/static/img/user.png" class="rouded border border-dark col-md-1 rounded mx-auto d-block w-100 p-2"
+        alt="user">
+    </div>
+    <div class="col-md-11 ">
+      <b>{{comment.user.username}} </b>
+      <span class="badge badge-pill bg-secondary">{{comment.timestamp | naturaltime}}</span>
+      <div>{{comment.comment}}</div>
+
+      <div class="reply mx-0">
+        <button class="btn btn-sm btn-outline-primary" type="button" data-bs-toggle="collapse"
+          data-bs-target="#reply{{comment.sno}}" aria-expanded="false" aria-controls="reply{{comment.sno}}">
+          Reply
+        </button>
+
+        <div class="collapse" id="reply{{comment.sno}}">
+          <div class="card card-body my-2">
+
+            <form action="/blog/postComment" method="post">
+              {% csrf_token %}
+
+              <div class="form-group">
+                <label >Post a Reply</label><br><br>
+                <input type="comment" name="comment" class="form-control" placeholder="Enter your Reply Here !">
+                <input type="hidden" name="parentSno" value="{{comment.sno}}">
+              </div>
+
+              <input type="hidden" name="postSno" value="{{post.sno}}">
+              <br>
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+
+          </div>
+        </div>
+
+        <div class="replies bg-danger my-2">
+        <br></div>
+
+
+
+      </div>
+
+
+    </div>
+  </div>
+
+  {% endfor %}
+
+</div>
+{% endblock %}
